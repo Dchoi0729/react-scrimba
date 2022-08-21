@@ -20,10 +20,12 @@ body {
     justify-content: center;
     align-items: center;
     border: black solid 1px;
+    height: 650px;
 }
 
 .questionbox{
     padding: 50px 0px 0px 75px;
+    height: auto;
 }
 
 button:active {
@@ -33,7 +35,6 @@ button:active {
 main {
     position: relative;
     width: 600px;
-    height: 650px;
     background-color: #F5F7FB;
 
     background-image: url(./assets/blobBottom.png), url(./assets/blobTop.png);
@@ -110,16 +111,10 @@ main {
     color: #F5F7FB;
     border: none;
     margin-top: 20px;
+    margin-bottom: 20px;
     cursor: pointer;
 }
 
-.main--settings{
-    width: 30px;
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    cursor: pointer;
-}
 
 .question{
     display: flex;
@@ -158,4 +153,35 @@ main {
     cursor: pointer;
 
     color: #293264;
+}
+
+fieldset{
+    width: 180px;
+}
+
+.popup--settings{
+    width: 30px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.popup--questionNum{
+    display: flex;
+    gap: 10px;
+}
+
+.popup--apply{
+    width: 80px;
+    height: 35px;
+    background: #4D5B9E;
+    border-radius: 10px;
+    font-size: 11px;
+    font-family: Inter;
+    font-weight: 400;
+    color: #F5F7FB;
+    border: none;
+    margin-top: 20px;
+    cursor: pointer;
 }

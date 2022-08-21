@@ -2,6 +2,7 @@ import React from "react"
 import Question from "./components/Question"
 import { nanoid } from "nanoid"
 import Popup from "./components/Popup"
+import Confetti from "react-confetti"
 
 export default function App() {
 
@@ -11,18 +12,49 @@ export default function App() {
         return textarea.value
     }
 
+    const [userSetting, setUserSetting] = React.useState({
+        questionNumber: 5,
+        difficulty: "hard",
+        category: "Any Category"
+    })
     const [start, setStart] = React.useState(false)
     const [questionData, setQuestionData] = React.useState({})
     const [givenAnswers, setGivenAnswers] = React.useState([])
-    const [gameStatus, setGameStatus] = React.useState({score:0,done:false, again:false})
+    const [gameStatus, setGameStatus] = React.useState({
+        score:0,
+        done:false,
+        again:false,
+        confetti:false
+    })
+
 
     function startQuiz(){
         setStart(true)
     }
 
+    function generateUrl(){
+        let category=""
+        switch(userSetting.category){
+            case "General Knowledge":
+                category="&category=9"
+                break
+            case "Science: Computers":
+                category="&category=18"
+                break
+            case "Science: Mathematics":
+                category="&category=19"
+                break
+            case "Animals":
+                category="&category=27"
+                break
+        }
+
+        return `https://opentdb.com/api.php?amount=${userSetting.questionNumber}&type=multiple&difficulty=${userSetting.difficulty}${category}`
+    }
+
     React.useEffect(() => {
         async function getQuestions() {
-            const res = await fetch("https://opentdb.com/api.php?amount=5&type=multiple")
+            const res = await fetch(generateUrl())
             const data = await res.json()
             const finalData = data.results.map(question => {
                 const id = nanoid()
@@ -35,13 +67,23 @@ export default function App() {
     }, [gameStatus.again])
 
 
+    function changeUserSetting(event){
+        const {name, value, type, checked} = event.target
+        setUserSetting(prevData => {
+            return {
+                ...prevData,
+                [name]: type === "checkbox" ? checked : value
+            }
+        })
+    }
+
     function playAgain(){
-        setGameStatus(prev => ({score:0,done:false, again:!prev.again}))
+        setGameStatus(prev => ({score:0,done:false, again:!prev.again, confetti:false}))
         setGivenAnswers([])
     }
 
 
-    function chooseAnswer(id){
+    function chooseAnswer(event, id){
         setGivenAnswers(oldAns => oldAns.map(prev => {
             return prev.id === id ?
                 {...prev, answer: event.target.innerText} :
@@ -68,50 +110,60 @@ export default function App() {
                     question
             }))
         }
+        const currHighScore = localStorage.getItem("score")
+        if(parseInt(currHighScore) <= score/userSetting.questionNumber * 100){
+            const grade = score/userSetting.questionNumber * 100 
+            localStorage.setItem("score", grade.toString())
+        }
+        if(score==userSetting.questionNumber){
+            setGameStatus(prev => ({...prev, confetti: true}))
+        }
+
         setGameStatus(prev => ({...prev, score: score, done: true}))
     }
     
-    console.log(givenAnswers)
-
     return (
-        <main className={`${start ? "questionbox" : "centerbox"}`}>
-            {
-                start ?
-                    <div className="main--questions">
-                        {questionData.map(data => <Question
-                            key={data.id}
-                            id={data.id}
-                            chooseAnswer={() => chooseAnswer(data.id)}
-                            question={data.question}
-                            answers={[...data.incorrect_answers,data.correct_answer]}
-                            givenAnswers={givenAnswers}
-                            gameStatus={gameStatus}
-                        />)}
-                        <div className="main--bottom">
-                            {gameStatus.done && 
-                                <h3 className="main--score">
-                                    You scored {gameStatus.score} / 5 correct answers
-                                </h3>}
-                            <button 
-                                className="main--button" 
-                                onClick={gameStatus.done ? playAgain:checkAnswers}
-                            >
-                                {gameStatus.done ? "Play Again" : "Check Answers"}
-                            </button>
+        <>
+            {gameStatus.confetti && <Confetti />}
+            <main className={`${start ? "questionbox" : "centerbox"}`}>
+                {
+                    start ?
+                        <div className="main--questions">
+                            {questionData.map(data => <Question
+                                key={data.id}
+                                id={data.id}
+                                chooseAnswer={(event) => chooseAnswer(event, data.id)}
+                                question={data.question}
+                                answers={[...data.incorrect_answers,data.correct_answer]}
+                                givenAnswers={givenAnswers}
+                                gameStatus={gameStatus}
+                            />)}
+                            <div className="main--bottom">
+                                {gameStatus.done && 
+                                    <h3 className="main--score">
+                                        You scored {gameStatus.score} / {userSetting.questionNumber} correct answers
+                                    </h3>}
+                                <button 
+                                    className="main--button" 
+                                    onClick={gameStatus.done ? playAgain:checkAnswers}
+                                >
+                                    {gameStatus.done ? "Play Again" : "Check Answers"}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    : 
-                    <div className="main--welcome">
-                        <h1 className="welcome--title">Quizzical</h1>
-                        <h3 className="welcome--description">some description if needed</h3>
-                        <button 
-                            className="welcome--startButton"
-                            onClick={startQuiz}
-                        > Start quiz </button>
-                    </div>
-            }
+                        : 
+                        <div className="main--welcome">
+                            <h1 className="welcome--title">Quizzical</h1>
+                            <h3 className="welcome--description">some description if needed</h3>
+                            <button 
+                                className="welcome--startButton"
+                                onClick={startQuiz}
+                            > Start quiz </button>
+                        </div>
+                }
 
-            {start && <Popup />}
-        </main>
+                {start && <Popup playAgain={playAgain} handleChange={changeUserSetting} userSetting={userSetting} />}
+            </main>
+        </>
     )
 }

@@ -31,6 +31,7 @@ button:active {
 }
 
 main {
+    position: relative;
     width: 600px;
     height: 650px;
     background-color: #F5F7FB;
@@ -109,6 +110,14 @@ main {
     color: #F5F7FB;
     border: none;
     margin-top: 20px;
+    cursor: pointer;
+}
+
+.main--settings{
+    width: 30px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
     cursor: pointer;
 }
 

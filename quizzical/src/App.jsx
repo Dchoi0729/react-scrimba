@@ -1,6 +1,7 @@
 import React from "react"
 import Question from "./components/Question"
 import { nanoid } from "nanoid"
+import Popup from "./components/Popup"
 
 export default function App() {
 
@@ -77,7 +78,6 @@ export default function App() {
             {
                 start ?
                     <div className="main--questions">
-
                         {questionData.map(data => <Question
                             key={data.id}
                             id={data.id}
@@ -110,6 +110,8 @@ export default function App() {
                         > Start quiz </button>
                     </div>
             }
+
+            {start && <Popup />}
         </main>
     )
 }

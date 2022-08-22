@@ -14,19 +14,21 @@ export default function Answer(props){
     let border = "0.771045px solid #4D5B9E"
 
     for(let i = 0; i < givenAnswers.length; i++){
-        if(givenAnswers[i].answer === text){
-            isClicked=true
-        }
-        if(isClicked){
-            if(givenAnswers[i].correct_answer === text){
-                isCorrect=true
+        if(givenAnswers[i].id === id){
+            if(givenAnswers[i].answer === text){
+                isClicked=true
             }
-            color = isCorrect ? "#94D7A2" : "#F8BCBC"
-            border = "none"
-        }else{
-            if(givenAnswers[i].correct_answer === text){
-                color = "#94D7A2"
+            if(isClicked){
+                if(givenAnswers[i].correct_answer === text){
+                    isCorrect=true
+                }
+                color = isCorrect ? "#94D7A2" : "#F8BCBC"
                 border = "none"
+            }else{
+                if(givenAnswers[i].correct_answer === text){
+                    color = "#94D7A2"
+                    border = "none"
+                }
             }
         }
     }

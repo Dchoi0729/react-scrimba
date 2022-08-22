@@ -4,6 +4,8 @@ import { nanoid } from "nanoid"
 import Popup from "./components/Popup"
 import Confetti from "react-confetti"
 
+//Add Header
+
 export default function App() {
 
     function decodeEntity(inputStr) {
@@ -24,7 +26,8 @@ export default function App() {
         score:0,
         done:false,
         again:false,
-        confetti:false
+        confetti:false,
+        goodData:true
     })
 
 
@@ -56,6 +59,9 @@ export default function App() {
         async function getQuestions() {
             const res = await fetch(generateUrl())
             const data = await res.json()
+            if(data.response_code != 0){
+                setGameStatus(prev => ({...prev, goodData:false}))
+            }
             const finalData = data.results.map(question => {
                 const id = nanoid()
                 setGivenAnswers(prev => [...prev, {id: id}])
@@ -65,7 +71,6 @@ export default function App() {
         }
         getQuestions()
     }, [gameStatus.again])
-
 
     function changeUserSetting(event){
         const {name, value, type, checked} = event.target
@@ -78,10 +83,9 @@ export default function App() {
     }
 
     function playAgain(){
-        setGameStatus(prev => ({score:0,done:false, again:!prev.again, confetti:false}))
+        setGameStatus(prev => ({score:0,done:false, again:!prev.again, confetti:false, goodData:true}))
         setGivenAnswers([])
     }
-
 
     function chooseAnswer(event, id){
         setGivenAnswers(oldAns => oldAns.map(prev => {
@@ -110,7 +114,7 @@ export default function App() {
                     question
             }))
         }
-        const currHighScore = localStorage.getItem("score")
+        const currHighScore = localStorage.getItem("score") || 0
         if(parseInt(currHighScore) <= score/userSetting.questionNumber * 100){
             const grade = score/userSetting.questionNumber * 100 
             localStorage.setItem("score", grade.toString())
@@ -124,33 +128,46 @@ export default function App() {
     
     return (
         <>
+            <header>
+                QUIZZICAL
+            </header>
             {gameStatus.confetti && <Confetti />}
-            <main className={`${start ? "questionbox" : "centerbox"}`}>
+            <main className={`${start && gameStatus.goodData ? "questionbox" : "centerbox"}`}>
                 {
                     start ?
-                        <div className="main--questions">
-                            {questionData.map(data => <Question
-                                key={data.id}
-                                id={data.id}
-                                chooseAnswer={(event) => chooseAnswer(event, data.id)}
-                                question={data.question}
-                                answers={[...data.incorrect_answers,data.correct_answer]}
-                                givenAnswers={givenAnswers}
-                                gameStatus={gameStatus}
-                            />)}
-                            <div className="main--bottom">
-                                {gameStatus.done && 
-                                    <h3 className="main--score">
-                                        You scored {gameStatus.score} / {userSetting.questionNumber} correct answers
-                                    </h3>}
-                                <button 
-                                    className="main--button" 
-                                    onClick={gameStatus.done ? playAgain:checkAnswers}
-                                >
-                                    {gameStatus.done ? "Play Again" : "Check Answers"}
-                                </button>
+                        gameStatus.goodData ? 
+                            <div className="main--questions">
+                                {questionData.map(data => <Question
+                                    key={data.id}
+                                    id={data.id}
+                                    chooseAnswer={(event) => chooseAnswer(event, data.id)}
+                                    question={data.question}
+                                    answers={[...data.incorrect_answers,data.correct_answer]}
+                                    givenAnswers={givenAnswers}
+                                    gameStatus={gameStatus}
+                                />)}
+                                <div className="main--bottom">
+                                    {gameStatus.done && 
+                                        <h3 className="main--score">
+                                            You scored {gameStatus.score} / {userSetting.questionNumber} correct answers
+                                        </h3>}
+                                    <button 
+                                        className="main--button" 
+                                        onClick={gameStatus.done ? playAgain:checkAnswers}
+                                    >
+                                        {gameStatus.done ? "Play Again" : "Check Answers"}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                            :
+                            <div className="main--apology">
+                                <img 
+                                    alt="apology" 
+                                    class="border img-fluid" 
+                                    src="http://memegen.link/custom/OOPS! please use/different question settings.jpg?alt=https://i.imgur.com/CsCgN7Ll.png&width=400" 
+                                    title="apology" 
+                                />
+                            </div>
                         : 
                         <div className="main--welcome">
                             <h1 className="welcome--title">Quizzical</h1>

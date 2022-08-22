@@ -6,6 +6,7 @@ import "reactjs-popup/dist/index.css"
 
 export default function PopupGfg(props){
     const userSetting = props.userSetting
+    const score = localStorage.getItem("score") || 0
 
     return(
         <div>
@@ -25,7 +26,7 @@ export default function PopupGfg(props){
                 }
                 className="popup"
             >
-                <div>High Score: {`${localStorage.getItem("score")}%` || "0%"}</div>
+                <div>High Score: {`${score}%`}</div>
                 <fieldset>
                     <legend>Question Number</legend>
                     <div className="popup--questionNum">

@@ -26,6 +26,7 @@ body {
 .questionbox{
     padding: 50px 0px 0px 75px;
     height: auto;
+    min-height: 650px;
 }
 
 button:active {
@@ -75,6 +76,13 @@ main {
     height: 52px;
     border-radius: 10px;
     cursor: pointer;
+}
+
+.main--apology{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .main--questions{

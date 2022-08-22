@@ -1,23 +1,15 @@
 import React from "react"
 import Answer from "./Answer"
 
-export default function Question(props){
-    let question = props.question
-    let answerChoices = props.answers.sort()
+export default function Trivia(props){
 
-    function decodeEntity(inputStr) {
-        const textarea = document.createElement("textarea")
-        textarea.innerHTML = inputStr
-        return textarea.value
-    }
-
-    question = decodeEntity(question)
-    answerChoices = answerChoices.map(choice => decodeEntity(choice))
+    const question = props.question
+    const answerChoices = props.answers.sort()
 
     return(
-        <div className="question">
-            <h1 className="question--question">{question}</h1>
-            <div className="question--answerList">
+        <div className="trivia">
+            <h1 className="trivia--question">{question}</h1>
+            <div className="trivia--answerList">
                 {answerChoices.map((answer, index) => {
                     return(
                         <Answer 

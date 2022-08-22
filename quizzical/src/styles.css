@@ -14,23 +14,34 @@ body {
     align-items: center;
 }
 
-.centerbox {
+fieldset{
+    width: 180px;
+}
+
+.flexbox-col{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: black solid 1px;
-    height: 650px;
 }
 
-.questionbox{
-    padding: 50px 0px 0px 75px;
-    height: auto;
-    min-height: 650px;
+button, select, input{
+    cursor:pointer;
 }
 
 button:active {
     box-shadow: inset 5px 5px 10px -3px rgba(0, 0, 0, 0.7);
+}
+
+/* Main div styling + conditional styling*/
+.welcome-box {
+    height: 650px;
+}
+
+.question-box{
+    padding: 50px 0px 0px 75px;
+    height: auto;
+    min-height: 650px;
 }
 
 main {
@@ -44,57 +55,48 @@ main {
 
     color: #293264;
 }
+/* Main div conditional styling*/
 
-.main--welcome{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
 
+/* Welcome page styling */
 .welcome--title{
-    font-size: 31.25px;
     font-family: Karla;
+    font-size: 31.25px;
     margin: 0px 0px 5px 0px;
 }
 
 .welcome--description{
-    font-size: 16px;
     font-family: Inter;
+    font-size: 16px;
     font-weight: 400;
     margin: 0px 0px 25px 0px;
 }
 
 .welcome--startButton{
+    width: 193px;
+    height: 52px;
     background-color: #4D5B9E;
     font-size: 16px;
     font-family: Inter;
     font-weight: 400;
     color: #F5F7FB;
     border: none;
-    width: 193px;
-    height: 52px;
     border-radius: 10px;
-    cursor: pointer;
 }
+/* Welcome page styling */
 
-.main--apology{
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
 
+/* Main page questions styling*/
 .main--questions{
-    display: flex;
-    flex-direction: column;
     width: 450px;
 }
+/* Main page questions styling*/
 
+
+/* Main page bottom row styling */
 .main--bottom{
     display:flex;
     justify-content: center;
-    align-items: center;
 }
 
 .main--score{
@@ -120,53 +122,52 @@ main {
     border: none;
     margin-top: 20px;
     margin-bottom: 20px;
-    cursor: pointer;
 }
+/* Main page bottom row styling */
 
 
-.question{
+/* Trivia component styling */
+.trivia{
     display: flex;
     flex-direction: column;
     justify-content: left;
-    
     width: 450px;
     border-bottom: 1px #DBDEF0 solid;
 }
 
-.question--question{
+.trivia--question{
     font-family: Karla;
-    font-weight: 700;
     font-size: 16px;
+    font-weight: 700;
     margin: 10px 0px 10px 0px;
 }
 
-.question--answerList{
+.trivia--answerList{
     display: flex;
     flex-direction: row;
 }
+/* Trivia component styling */
 
-.question--answer{
+
+/* Answer component styling */
+.answer{
     font-family: Inter;
     font-weight: 500;
     font-size: 11px;
     margin: 0px 15px 10px 0px;
-    box-sizing: border-box;
+    color: #293264;
 
     min-width: 60px;
-    min-height:21px;
+    min-height: 21px;
 
     border: 0.771045px solid #4D5B9E;
     border-radius: 7.71045px;
     background-color: #F5F7FB;
-    cursor: pointer;
-
-    color: #293264;
 }
+/* Answer component styling */
 
-fieldset{
-    width: 180px;
-}
 
+/* Popup component styling */
 .popup--settings{
     width: 30px;
     position: absolute;
@@ -183,13 +184,15 @@ fieldset{
 .popup--apply{
     width: 80px;
     height: 35px;
-    background: #4D5B9E;
-    border-radius: 10px;
-    font-size: 11px;
+    margin-top: 20px;
+    
     font-family: Inter;
+    font-size: 11px;
     font-weight: 400;
     color: #F5F7FB;
+
+    background-color: #4D5B9E;
     border: none;
-    margin-top: 20px;
-    cursor: pointer;
+    border-radius: 10px;
 }
+/* Popup component styling */

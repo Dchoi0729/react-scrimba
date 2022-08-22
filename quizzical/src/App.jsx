@@ -1,27 +1,19 @@
 import React from "react"
-import Question from "./components/Question"
+import Trivia from "./components/Trivia"
 import { nanoid } from "nanoid"
 import Popup from "./components/Popup"
 import Confetti from "react-confetti"
 
-//Add Header
-
 export default function App() {
 
-    function decodeEntity(inputStr) {
-        const textarea = document.createElement("textarea")
-        textarea.innerHTML = inputStr
-        return textarea.value
-    }
-
+    const [start, setStart] = React.useState(false)
+    const [questionData, setQuestionData] = React.useState({})
+    const [givenAnswers, setGivenAnswers] = React.useState([])
     const [userSetting, setUserSetting] = React.useState({
         questionNumber: 5,
         difficulty: "hard",
         category: "Any Category"
     })
-    const [start, setStart] = React.useState(false)
-    const [questionData, setQuestionData] = React.useState({})
-    const [givenAnswers, setGivenAnswers] = React.useState([])
     const [gameStatus, setGameStatus] = React.useState({
         score:0,
         done:false,
@@ -30,11 +22,25 @@ export default function App() {
         goodData:true
     })
 
+    React.useEffect(() => {
+        async function getQuestions() {
+            const res = await fetch(generateUrl())
+            const data = await res.json()
+            if(data.response_code != 0){
+                setGameStatus(prev => ({...prev, goodData:false}))
+            }
+            let finalData = data.results.map(question => {
+                const id = nanoid()
+                setGivenAnswers(prev => [...prev, {id: id}])
+                return {...question, id: id}
+            })
+            finalData = decodeData(finalData)
+            setQuestionData(finalData)
+        }
+        getQuestions()
+    }, [gameStatus.again])
 
-    function startQuiz(){
-        setStart(true)
-    }
-
+    // Generate a api url given user setting
     function generateUrl(){
         let category=""
         switch(userSetting.category){
@@ -55,23 +61,7 @@ export default function App() {
         return `https://opentdb.com/api.php?amount=${userSetting.questionNumber}&type=multiple&difficulty=${userSetting.difficulty}${category}`
     }
 
-    React.useEffect(() => {
-        async function getQuestions() {
-            const res = await fetch(generateUrl())
-            const data = await res.json()
-            if(data.response_code != 0){
-                setGameStatus(prev => ({...prev, goodData:false}))
-            }
-            const finalData = data.results.map(question => {
-                const id = nanoid()
-                setGivenAnswers(prev => [...prev, {id: id}])
-                return {...question, id: id}
-            })
-            setQuestionData(finalData)
-        }
-        getQuestions()
-    }, [gameStatus.again])
-
+    // Gathers input from various controlled forms in popup and changes user setting
     function changeUserSetting(event){
         const {name, value, type, checked} = event.target
         setUserSetting(prevData => {
@@ -82,11 +72,13 @@ export default function App() {
         })
     }
 
+    // Resets games, resetting all necessary state to initial starting condition
     function playAgain(){
         setGameStatus(prev => ({score:0,done:false, again:!prev.again, confetti:false, goodData:true}))
         setGivenAnswers([])
     }
 
+    // Gets information from the Answer component and updates givenAnswer state
     function chooseAnswer(event, id){
         setGivenAnswers(oldAns => oldAns.map(prev => {
             return prev.id === id ?
@@ -95,6 +87,7 @@ export default function App() {
         }))
     }
 
+    // Checks givenAnswer with actual answers in questionData
     function checkAnswers(){
         let score = 0
         for(let i = 0; i < givenAnswers.length; i++){
@@ -105,12 +98,12 @@ export default function App() {
                     correctAns = questionData[j].correct_answer
                 }
             }
-            if(decodeEntity(correctAns) === givenAnswers[i].answer){
+            if(correctAns === givenAnswers[i].answer){
                 score++
             }
             setGivenAnswers(prev => prev.map(question => {
                 return question.id === id ? 
-                    {...question, correct_answer:decodeEntity(correctAns)} :
+                    {...question, correct_answer:correctAns} :
                     question
             }))
         }
@@ -128,16 +121,13 @@ export default function App() {
     
     return (
         <>
-            <header>
-                QUIZZICAL
-            </header>
             {gameStatus.confetti && <Confetti />}
-            <main className={`${start && gameStatus.goodData ? "questionbox" : "centerbox"}`}>
+            <main className={`${start && gameStatus.goodData ? "question-box" : "welcome-box flexbox-col"}`}>
                 {
                     start ?
                         gameStatus.goodData ? 
-                            <div className="main--questions">
-                                {questionData.map(data => <Question
+                            <div className="main--questions flexbox-col">
+                                {questionData.map(data => <Trivia
                                     key={data.id}
                                     id={data.id}
                                     chooseAnswer={(event) => chooseAnswer(event, data.id)}
@@ -150,7 +140,8 @@ export default function App() {
                                     {gameStatus.done && 
                                         <h3 className="main--score">
                                             You scored {gameStatus.score} / {userSetting.questionNumber} correct answers
-                                        </h3>}
+                                        </h3>
+                                    }
                                     <button 
                                         className="main--button" 
                                         onClick={gameStatus.done ? playAgain:checkAnswers}
@@ -160,7 +151,7 @@ export default function App() {
                                 </div>
                             </div>
                             :
-                            <div className="main--apology">
+                            <div className="flexbox-col">
                                 <img 
                                     alt="apology" 
                                     class="border img-fluid" 
@@ -169,12 +160,12 @@ export default function App() {
                                 />
                             </div>
                         : 
-                        <div className="main--welcome">
+                        <div className="flexbox-col">
                             <h1 className="welcome--title">Quizzical</h1>
                             <h3 className="welcome--description">some description if needed</h3>
                             <button 
                                 className="welcome--startButton"
-                                onClick={startQuiz}
+                                onClick={() => setStart(true)}
                             > Start quiz </button>
                         </div>
                 }
@@ -183,4 +174,39 @@ export default function App() {
             </main>
         </>
     )
+}
+
+// Decodes all entities in the data returned by api 
+function decodeData(inputData){
+
+    const finalData = []
+
+    for(let i = 0; i < inputData.length; i++){
+        const data = inputData[i]
+        const modifiedData = {}
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                if(data[key] instanceof Array){
+                    let answerArray = []
+                    for(let j = 0; j < data[key].length; j++){
+                        answerArray.push(decodeEntity(data[key][j]))
+                    }
+                    modifiedData[key] = answerArray
+                }
+                else{
+                    modifiedData[key] = decodeEntity(data[key])
+                }
+            }
+        }
+        finalData.push(modifiedData)
+    }
+
+    return finalData
+}
+
+// Decode all entities in a given string and return a clean version
+function decodeEntity(inputStr) {
+    const textarea = document.createElement("textarea")
+    textarea.innerHTML = inputStr
+    return textarea.value
 }

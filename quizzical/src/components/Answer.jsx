@@ -1,7 +1,6 @@
 import React from "react"
 
 export default function Answer(props){
-
     const id = props.id
     const done = props.gameStatus.done
     const givenAnswers = props.givenAnswers
@@ -13,6 +12,7 @@ export default function Answer(props){
     let color = "#F5F7FB"
     let border = "0.771045px solid #4D5B9E"
 
+    // Set the styling variables accordingly
     for(let i = 0; i < givenAnswers.length; i++){
         if(givenAnswers[i].id === id){
             if(givenAnswers[i].answer === text){
@@ -48,7 +48,7 @@ export default function Answer(props){
 
     return(
         <button
-            className="question--answer"
+            className="answer"
             style={styles}
             onClick={props.handleClick}
             disabled={done ? true : false}

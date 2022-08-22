@@ -24,7 +24,6 @@ export default function PopupGfg(props){
                         gap: "10px"
                     }
                 }
-                className="popup"
             >
                 <div>High Score: {`${score}%`}</div>
                 <fieldset>
